@@ -137,6 +137,15 @@
                     "type": "boolean",
                     "default": true,
                     "description": "%ext.config.syncExtensions%"
+                },
+                "sync.repository": {
+                    "type": "string",
+                    "enum": [
+                        "github",
+                        "gitlab"
+                    ],
+                    "default": "github",
+                    "description": "%ext.config.repository%"
                 }
             },
             "title": "%ext.config.title%"

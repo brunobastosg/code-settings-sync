@@ -12,6 +12,7 @@
   "ext.config.askGistName": "Ask gist name upon creating. Helps you to identify the gist if you have multiple gists.",
   "ext.config.removeExtensions": "Set it to false if you dont want to remove extensions while downloading.",
   "ext.config.syncExtensions": "Set it to false if you dont want to upload / download the extensions.",
+  "ext.config.repository": "Set it to the repository hosting service where your settings should be stored (github or gitlab).",
   "cmd.howSetting.title": "Sync : How To Configure",
   "cmd.updateSettings.title": "Sync : Update / Upload Settings",
   "cmd.updateSettings.info.uploading": "Sync : Uploading / Updating Your Settings In GitHub.",
