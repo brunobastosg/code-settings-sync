@@ -9,6 +9,7 @@ import * as lockfile from "./lockfile";
 import { File, FileService } from "./service/fileService";
 import { GitHubService } from "./service/githubService";
 import { ExtensionInformation, PluginService } from "./service/pluginService";
+import { IRepositoryService } from "./service/repositoryService";
 import {
   CloudSetting,
   CustomSettings,
@@ -66,7 +67,7 @@ export class Sync {
     const args = arguments;
     const env = new Environment(this.context);
     const common = new Commons(env, this.context);
-    let github: GitHubService = null;
+    let repository: IRepositoryService = null;
     let localConfig: LocalConfig = new LocalConfig();
     const allSettingFiles: File[] = [];
     let uploadedExtensions: ExtensionInformation[] = [];
@@ -83,7 +84,8 @@ export class Sync {
         }
       }
 
-      github = new GitHubService(
+      // TODO: read config and instantiate correct service
+      repository = new GitHubService(
         localConfig.customConfig.token,
         localConfig.customConfig.githubEnterpriseUrl
       );
@@ -225,7 +227,7 @@ export class Sync {
             customSettings.gistDescription = await common.AskGistName();
           }
           newGIST = true;
-          const gistID = await github.CreateEmptyGIST(
+          const gistID = await repository.CreateEmptyGIST(
             localConfig.publicGist,
             customSettings.gistDescription
           );
@@ -242,7 +244,7 @@ export class Sync {
             return;
           }
         }
-        let gistObj = await github.ReadGist(syncSetting.gist);
+        let gistObj = await repository.ReadGist(syncSetting.gist);
         if (!gistObj) {
           vscode.window.showErrorMessage(
             localize("cmd.updateSettings.error.readGistFail", syncSetting.gist)
@@ -252,8 +254,8 @@ export class Sync {
 
         if (gistObj.data.owner !== null) {
           const gistOwnerName: string = gistObj.data.owner.login.trim();
-          if (github.userName != null) {
-            const userName: string = github.userName.trim();
+          if (repository.userName != null) {
+            const userName: string = repository.userName.trim();
             if (gistOwnerName !== userName) {
               Commons.LogException(
                 null,
@@ -280,8 +282,8 @@ export class Sync {
           localize("cmd.updateSettings.info.uploadingFile"),
           3000
         );
-        gistObj = github.UpdateGIST(gistObj, allSettingFiles);
-        completed = await github.SaveGIST(gistObj.data);
+        gistObj = repository.UpdateGIST(gistObj, allSettingFiles);
+        completed = await repository.SaveGIST(gistObj.data);
         if (!completed) {
           vscode.window.showErrorMessage(
             localize("cmd.updateSettings.error.gistNotSave")
@@ -363,7 +365,7 @@ export class Sync {
       syncSetting: ExtensionConfig,
       customSettings: CustomSettings
     ) {
-      const github = new GitHubService(
+      const repository = new GitHubService(
         customSettings.token,
         customSettings.githubEnterpriseUrl
       );
@@ -373,7 +375,7 @@ export class Sync {
         2000
       );
 
-      const res = await github.ReadGist(syncSetting.gist);
+      const res = await repository.ReadGist(syncSetting.gist);
 
       if (!res) {
         Commons.LogException(res, "Sync : Unable to Read Gist.", true);
