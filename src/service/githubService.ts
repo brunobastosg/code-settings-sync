@@ -4,6 +4,7 @@ import * as GitHubApi from "@octokit/rest";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as vscode from "vscode";
 import { File } from "./fileService";
+import { IRepositoryService } from "./repositoryService";
 
 interface IEnv {
   [key: string]: string | undefined;
@@ -11,7 +12,7 @@ interface IEnv {
   HTTP_PROXY: string;
 }
 
-export class GitHubService {
+export class GitHubService implements IRepositoryService {
   public userName: string = null;
   public name: string = null;
   private github: GitHubApi = null;
