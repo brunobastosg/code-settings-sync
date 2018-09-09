@@ -9,6 +9,7 @@ export class ExtensionConfig {
   public autoDownload: boolean = false;
   public autoUpload = false;
   public forceDownload: boolean = false;
+  public repository: "github" | "gitlab" = "github";
 }
 
 export class LocalConfig {
