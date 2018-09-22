@@ -173,6 +173,7 @@
         "adm-zip": "^0.4.11",
         "chokidar": "^2.0.2",
         "fs-extra": "^7.0.0",
+        "gitlab": "^4.1.0",
         "https-proxy-agent": "^2.1.1",
         "lockfile": "^1.0.4",
         "temp": "^0.8.3"

@@ -8,6 +8,7 @@ import localize from "./localize";
 import * as lockfile from "./lockfile";
 import { File, FileService } from "./service/fileService";
 import { GitHubService } from "./service/githubService";
+import { GitLabService } from "./service/gitlabService";
 import { ExtensionInformation, PluginService } from "./service/pluginService";
 import { IRepositoryService } from "./service/repositoryService";
 import {
@@ -84,11 +85,18 @@ export class Sync {
         }
       }
 
-      // TODO: read config and instantiate correct service
-      repository = new GitHubService(
-        localConfig.customConfig.token,
-        localConfig.customConfig.githubEnterpriseUrl
-      );
+      if (localConfig.extConfig.repository === "github") {
+        repository = new GitHubService(
+          localConfig.customConfig.token,
+          localConfig.customConfig.githubEnterpriseUrl
+        );
+      } else {
+        repository = new GitLabService(
+          localConfig.customConfig.token,
+          localConfig.customConfig.githubEnterpriseUrl
+        );
+      }
+
       // ignoreSettings = await common.GetIgnoredSettings(localConfig.customConfig.ignoreUploadSettings);
       await startGitProcess(localConfig.extConfig, localConfig.customConfig);
       // await common.SetIgnoredSettings(ignoreSettings);
@@ -252,6 +260,7 @@ export class Sync {
           return;
         }
 
+        // FIXME: whe using gitlab, 'gistObj' is a different object
         if (gistObj.data.owner !== null) {
           const gistOwnerName: string = gistObj.data.owner.login.trim();
           if (repository.userName != null) {
