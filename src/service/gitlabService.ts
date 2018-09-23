@@ -1,12 +1,13 @@
 "use strict";
 
-import { Snippets } from "gitlab";
+import Gitlab = require("gitlab/dist/es5");
 import { File } from "./fileService";
 import { IRepositoryService } from "./repositoryService";
 
 export class GitLabService implements IRepositoryService {
   public userName: string = null;
-  private gitlab: Snippets = null;
+  public name: string = null;
+  private gitlab: Gitlab = null;
   private GIST_JSON_EMPTY = {
     description: "Visual Studio Code Sync Settings Snippet",
     visibility: "private",
@@ -41,7 +42,13 @@ export class GitLabService implements IRepositoryService {
       token: userToken
     };
 
-    this.gitlab = new Snippets(gitlabConfig);
+    this.gitlab = new Gitlab.default(gitlabConfig);
+
+    this.gitlab.Users.current().then(res => {
+      this.userName = res.username;
+      this.name = res.name;
+      console.log("Sync : Connected with user : " + "'" + this.userName + "'");
+    });
   }
 
   public AddFile(list: File[], GIST_JSON_B: any) {
@@ -68,7 +75,7 @@ export class GitLabService implements IRepositoryService {
     }
 
     try {
-      const res = await this.gitlab.create(
+      const res = await this.gitlab.Snippets.create(
         this.GIST_JSON_EMPTY.description,
         "vscode-settings",
         JSON.stringify(this.GIST_JSON_EMPTY.files),
@@ -88,7 +95,7 @@ export class GitLabService implements IRepositoryService {
   }
 
   public async ReadGist(GIST: string): Promise<any> {
-    return await this.gitlab.show(GIST);
+    return await this.gitlab.Snippets.show(GIST);
   }
 
   public UpdateGIST(gistObject: any, files: File[]): any {
@@ -112,7 +119,7 @@ export class GitLabService implements IRepositoryService {
   }
 
   public async SaveGIST(gistObject: any): Promise<boolean> {
-    await this.gitlab.edit(gistObject.id, {}); // TODO: debug to see what kind of object 'gistObject' is
+    await this.gitlab.Snippets.edit(gistObject.id, {}); // TODO: debug to see what kind of object 'gistObject' is
     return true;
   }
 }
