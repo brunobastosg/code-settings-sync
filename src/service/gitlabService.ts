@@ -95,7 +95,18 @@ export class GitLabService implements IRepositoryService {
   }
 
   public async ReadGist(GIST: string): Promise<any> {
-    return await this.gitlab.Snippets.show(GIST);
+    const snippet = await this.gitlab.Snippets.show(GIST);
+    const gistObj = {
+      data: {
+        ...snippet,
+        owner: {
+          login: snippet.author.username
+        }
+      },
+      public: snippet.visibility === "public"
+    };
+    gistObj.data.files = await this.gitlab.Snippets.content(GIST);
+    return gistObj;
   }
 
   public UpdateGIST(gistObject: any, files: File[]): any {
@@ -119,7 +130,15 @@ export class GitLabService implements IRepositoryService {
   }
 
   public async SaveGIST(gistObject: any): Promise<boolean> {
-    await this.gitlab.Snippets.edit(gistObject.id, {}); // TODO: debug to see what kind of object 'gistObject' is
+    const transformedObj = {
+      id: gistObject.id,
+      title: gistObject.title,
+      file_name: gistObject.file_name,
+      description: gistObject.description,
+      visibility: gistObject.visibility,
+      content: JSON.stringify(gistObject.files)
+    };
+    await this.gitlab.Snippets.edit(transformedObj.id, transformedObj);
     return true;
   }
 }
